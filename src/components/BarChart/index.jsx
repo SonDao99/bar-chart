@@ -17,8 +17,8 @@ class BarChart extends Component {
   drawCanvas = () => {
     this.canvas = d3.select(this.chartRef.current)
       .append('canvas')
-      .attr('width', 1000)
-      .attr('height', 700)
+      .attr('width', 1400)
+      .attr('height', 500)
   }
 
   getInitialAxis = () => {
@@ -32,17 +32,17 @@ class BarChart extends Component {
       } 
     }))
 
-    this.rangeX = [0, this.data.length + 1];
+    this.rangeX = [0.5, this.data.length + 0.5];
     this.rangeY = [0, maxAoG];
 
     this.xScale = d3
       .scaleLinear()
-      .domain([this.rangeX])
-      .range([0, 1000]);
+      .domain(this.rangeX)
+      .range([0, 1400]);
     this.yScale = d3
       .scaleLinear()
-      .range(this.rangeY)
-      .domain([700, 0]);
+      .domain(this.rangeY)
+      .range([500, 0]);
   };
 
   setData = () => {
@@ -50,10 +50,21 @@ class BarChart extends Component {
     ctx = this.canvas.node().getContext('2d');
     ctx.beginPath();
     
-    ctx.fillStyle = "steelblue";
+    ctx.fillStyle = "rgba(204, 235, 235, 0.8)";
     this.data.forEach((d) => {
-      console.log(d.phase, d.existing_aog, 10, 700 - d.existing_aog)
-      ctx.fillRect(d.phase, d.existing_aog, 10, 700 - d.existing_aog);
+      if (d.is_coord_phase) {
+        ctx.fillRect(this.xScale(d.phase)-55, 0, 140, 500);
+      }
+    });
+
+    ctx.fillStyle = "#2d9554";
+    this.data.forEach((d) => {
+      ctx.fillRect(this.xScale(d.phase)-25, this.yScale(d.existing_aog), 30, 500 - this.yScale(d.existing_aog));
+    });
+
+    ctx.fillStyle = "#40a0fd";
+    this.data.forEach((d) => {
+      ctx.fillRect(this.xScale(d.phase)+25, this.yScale(d.predicted_aog), 30, 500 - this.yScale(d.predicted_aog));
     });
 
     ctx.closePath()
