@@ -32,13 +32,13 @@ class BarChart extends Component {
       } 
     }))
 
-    this.rangeX = [0, this.data.length];
+    this.rangeX = [0, this.data.length + 1];
     this.rangeY = [0, maxAoG];
 
     this.xScale = d3
       .scaleLinear()
-      .range(this.rangeX)
-      .domain([0, 1000]);
+      .domain([this.rangeX])
+      .range([0, 1000]);
     this.yScale = d3
       .scaleLinear()
       .range(this.rangeY)
@@ -50,19 +50,13 @@ class BarChart extends Component {
     ctx = this.canvas.node().getContext('2d');
     ctx.beginPath();
     
-    ctx.moveTo(-6.5, 0 + 0.5);
-    ctx.lineTo(0.5, 0 + 0.5);
-    ctx.lineTo(0.5, 700 + 0.5);
-    ctx.lineTo(-6.5, 700 + 0.5);
-    ctx.strokeStyle = "black";
-    ctx.stroke();
+    ctx.fillStyle = "steelblue";
+    this.data.forEach((d) => {
+      console.log(d.phase, d.existing_aog, 10, 700 - d.existing_aog)
+      ctx.fillRect(d.phase, d.existing_aog, 10, 700 - d.existing_aog);
+    });
 
-    ctx.save();
-    ctx.rotate(-Math.PI / 2);
-    ctx.textAlign = "right";
-    ctx.textBaseline = "top";
-    ctx.font = "bold 10px sans-serif";
-    ctx.fillText("Frequency", -10, 10);
+    ctx.closePath()
   }
 
   componentDidMount() {
