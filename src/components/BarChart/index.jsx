@@ -135,10 +135,35 @@ class BarChart extends Component {
 
   }
 
+  drawArrows = () => {
+    let ctx = this.ctx;
+    ctx = this.canvas.node().getContext('2d');
+
+    this.data.forEach((d, i) => {
+      if (d.predicted_aog > d.existing_aog) {
+        ctx.beginPath();
+        ctx.moveTo(this.xScale(i) - 20, (this.yScale(d.predicted_aog) - 20));
+        ctx.lineTo(this.xScale(i) - 10, (this.yScale(d.predicted_aog) - 20));
+        ctx.lineTo(this.xScale(i) - 15, (this.yScale(d.predicted_aog) - 30));
+        ctx.lineTo(this.xScale(i) - 20, (this.yScale(d.predicted_aog) - 20));
+        // ctx.fillStyle("green");
+        // ctx.fill();
+        ctx.strokeStyle = "#c6c9cc";
+        ctx.stroke();
+        ctx.closePath();
+      } else if (d.predicted_aog > d.existing_aog) {
+        return;
+      } else {
+        return;
+      }
+    })
+  }
+
   componentDidMount() {
     this.drawCanvas();
     this.getInitialAxis();
     this.drawData();
+    this.drawArrows();
   }
 
   render() {
