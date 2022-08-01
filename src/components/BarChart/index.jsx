@@ -59,7 +59,7 @@ class BarChart extends Component {
     ctx.fillStyle = "rgba(204, 235, 235, 0.8)";
     this.data.forEach((d) => {
       if (d.is_coord_phase) {
-        ctx.fillRect(this.xScale(d.phase)-55, 0, 140, this.height);
+        ctx.fillRect(this.xScale(d.phase)-65, 0, 160, this.height);
       }
     });
 
@@ -95,7 +95,7 @@ class BarChart extends Component {
     ctx.restore();
 
     //x axis labels
-    let xTickCount = 8,
+    let xTickCount = this.data.length,
       xTicks = this.xScale.ticks(xTickCount),
       xTickFormat = (d) => `PHASE ${d}`;
 
@@ -121,7 +121,7 @@ class BarChart extends Component {
     ctx.strokeStyle = "#c6c9cc";
     ctx.stroke();
 
-    // Blue rectangles for existign AoG
+    // Blue rectangles for existing AoG
     ctx.fillStyle = "#2d9554";
     this.data.forEach((d) => {
       ctx.fillRect(this.xScale(d.phase)-25, this.yScale(d.existing_aog), 30, this.height - this.yScale(d.existing_aog));
@@ -141,18 +141,65 @@ class BarChart extends Component {
 
     this.data.forEach((d, i) => {
       if (d.predicted_aog > d.existing_aog) {
+
+        //If difference in existing and predicted larger than length of arrow head, 
+        if ((this.yScale(d.existing_aog) - this.yScale(d.predicted_aog)) > 12) {
+          //Draw arrow head
+          ctx.beginPath();
+          ctx.moveTo(this.xScale(i+1) - 16, this.yScale(d.predicted_aog) + 12);
+          ctx.lineTo(this.xScale(i+1) - 4, this.yScale(d.predicted_aog) + 12);
+          ctx.lineTo(this.xScale(i+1) - 10, this.yScale(d.predicted_aog));
+          ctx.lineTo(this.xScale(i+1) - 16, this.yScale(d.predicted_aog) + 12);
+          ctx.strokeStyle = "#c6c9cc";
+          ctx.closePath();
+          ctx.stroke();
+          ctx.fillStyle = "#009999";
+          ctx.fill();
+
+          //Draw tail
+          ctx.beginPath();
+          ctx.moveTo(this.xScale(i+1) - 10, this.yScale(d.existing_aog) - 3);
+          ctx.lineTo(this.xScale(i+1) - 10, this.yScale(d.predicted_aog) + 12);
+          ctx.strokeStyle = "#009999";
+          ctx.stroke();
+
+        } else {
+
+          //Draw arrow head only
+          ctx.beginPath();
+          ctx.moveTo(this.xScale(i+1) - 16, this.yScale(d.existing_aog) - 3);
+          ctx.lineTo(this.xScale(i+1) - 4, this.yScale(d.existing_aog) - 3);
+          ctx.lineTo(this.xScale(i+1) - 10, this.yScale(d.existing_aog) - 15);
+          ctx.lineTo(this.xScale(i+1) - 16, this.yScale(d.existing_aog) - 3);
+          ctx.strokeStyle = "#c6c9cc";
+          ctx.closePath();
+          ctx.stroke();
+          ctx.fillStyle = "#009999";
+          ctx.fill();
+        }
+
+      } else if (d.existing_aog > d.predicted_aog) {
+        //Draw arrow head
         ctx.beginPath();
-        ctx.moveTo(this.xScale(i) - 20, (this.yScale(d.predicted_aog) - 20));
-        ctx.lineTo(this.xScale(i) - 10, (this.yScale(d.predicted_aog) - 20));
-        ctx.lineTo(this.xScale(i) - 15, (this.yScale(d.predicted_aog) - 30));
-        ctx.lineTo(this.xScale(i) - 20, (this.yScale(d.predicted_aog) - 20));
-        // ctx.fillStyle("green");
-        // ctx.fill();
+        ctx.moveTo(this.xScale(i+1) + 40, this.yScale(d.predicted_aog) - 3);
+        ctx.lineTo(this.xScale(i+1) + 46, this.yScale(d.predicted_aog) - 15);
+        ctx.lineTo(this.xScale(i+1) + 34, this.yScale(d.predicted_aog) - 15);
+        ctx.lineTo(this.xScale(i+1) + 40, this.yScale(d.predicted_aog) - 3);
         ctx.strokeStyle = "#c6c9cc";
-        ctx.stroke();
         ctx.closePath();
-      } else if (d.predicted_aog > d.existing_aog) {
-        return;
+        ctx.stroke();
+        ctx.fillStyle = "#fc4850";
+        ctx.fill();
+
+        //Draw tail
+        if ((this.yScale(d.predicted_aog) - this.yScale(d.existing_aog)) > 12) {
+          ctx.beginPath();
+          ctx.moveTo(this.xScale(i+1) + 40, this.yScale(d.predicted_aog) - 15);
+          ctx.lineTo(this.xScale(i+1) + 40, this.yScale(d.existing_aog));
+          ctx.strokeStyle = "#fc4850";
+          ctx.stroke();
+        }
+        
       } else {
         return;
       }
