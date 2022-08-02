@@ -38,7 +38,7 @@ class BarChart extends Component {
     }))
 
     this.rangeX = [0.5, this.data.length + 0.5];
-    this.rangeY = [0, maxAoG + 1000];
+    this.rangeY = [0, maxAoG + 2000];
 
     this.xScale = d3
       .scaleLinear()
@@ -64,7 +64,7 @@ class BarChart extends Component {
     });
 
     //Dotted horizontal lines
-    let yTickCount = 11,
+    let yTickCount = 12,
       yTicks = this.yScale.ticks(yTickCount),
 	    yTickFormat = this.yScale.tickFormat();
 
@@ -121,13 +121,13 @@ class BarChart extends Component {
     ctx.strokeStyle = "#c6c9cc";
     ctx.stroke();
 
-    // Blue rectangles for existing AoG
+    //Green rectangles for existing AoG
     ctx.fillStyle = "#2d9554";
     this.data.forEach((d) => {
       ctx.fillRect(this.xScale(d.phase)-25, this.yScale(d.existing_aog), 30, this.height - this.yScale(d.existing_aog));
     });
 
-    //Green rectangles for predicted AoG
+    //Blue rectangles for predicted AoG
     ctx.fillStyle = "#40a0fd";
     this.data.forEach((d) => {
       ctx.fillRect(this.xScale(d.phase)+25, this.yScale(d.predicted_aog), 30, this.height - this.yScale(d.predicted_aog));
@@ -142,8 +142,8 @@ class BarChart extends Component {
     this.data.forEach((d, i) => {
       if (d.predicted_aog > d.existing_aog) {
 
-        //If difference in existing and predicted larger than length of arrow head, 
-        if ((this.yScale(d.existing_aog) - this.yScale(d.predicted_aog)) > 12) {
+        //If difference in existing and predicted larger than length of arrow head (12) and gap from arrow head to bar (3), 
+        if ((this.yScale(d.existing_aog) - this.yScale(d.predicted_aog)) > 15) {
           //Draw arrow head
           ctx.beginPath();
           ctx.moveTo(this.xScale(i+1) - 16, this.yScale(d.predicted_aog) + 12);
@@ -192,7 +192,7 @@ class BarChart extends Component {
         ctx.fill();
 
         //Draw tail
-        if ((this.yScale(d.predicted_aog) - this.yScale(d.existing_aog)) > 12) {
+        if ((this.yScale(d.predicted_aog) - this.yScale(d.existing_aog)) > 15) {
           ctx.beginPath();
           ctx.moveTo(this.xScale(i+1) + 40, this.yScale(d.predicted_aog) - 15);
           ctx.lineTo(this.xScale(i+1) + 40, this.yScale(d.existing_aog));
@@ -206,11 +206,33 @@ class BarChart extends Component {
     })
   }
 
+  drawLabels = () => {
+    let ctx = this.ctx;
+    ctx = this.canvas.node().getContext('2d');
+
+    this.data.forEach((d, i) => {
+      if (d.existing_aog > d.predicted_aog) {
+        ctx.fillStyle = "#2d9554";
+        ctx.fillText(d.existing_aog, this.xScale(i+1)+6, this.yScale(d.existing_aog)-10);
+        ctx.fillStyle = "#fc4850";
+        ctx.fillText(
+          `${d.existing_aog - d.predicted_aog} - ${(d.existing_aog_percent - d.predicted_aog_percent).toFixed(2)}%`,
+          this.xScale(i+1)+130,
+          this.yScale(d.existing_aog - (d.existing_aog-d.predicted_aog)/2)
+        );
+        ctx.fillStyle = "#40a0fd";
+        ctx.fillText(d.predicted_aog, this.xScale(i+1)+95, this.yScale(d.predicted_aog)+10);
+      }
+    })
+
+  }
+
   componentDidMount() {
     this.drawCanvas();
     this.getInitialAxis();
     this.drawData();
     this.drawArrows();
+    this.drawLabels();
   }
 
   render() {
